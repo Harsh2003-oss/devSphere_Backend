@@ -4,35 +4,17 @@ connectDB();
 
 const express = require('express');
 const User = require("./models/User");
-
+const router = require('./routes/auth')
 const app = express();
-const bcrypt = require('bcrypt')
 
-const cookie = require('cookie')
-var cookieParser = require('cookie-parser')
 
-var jwt = require('jsonwebtoken');
+
+
 
 const {validateSignUpData,validateLogin} = require('./utils/valdation')
 
 app.use(express.json())
 
-app.post("/signup",validateSignUpData, async (req,res)=>{
-
-    const {password}= req.body;
-
-    const hashedPassword = await bcrypt.hash(password,10)
-
-
-    const user = new User({...req.body,password:hashedPassword})
-console.log(user)
-try {
-    await user.save();
-    res.send("Creatd success")
-} catch (error) {
-    res.send(error.message)
-}
-})
 
 app.post('/login', validateLogin,async (req,res)=>{
     try {
@@ -89,19 +71,6 @@ app.get('/feed', async (req,res) => {
     }
 })
 
-app.get('/profile', async (req,res) =>{
-
-    try {
-        const cokkie = "hasjdjhaidskljkldjopsjdinciapijdioshiakh";
-
-        res.send(cokkie)
-
-
-    } catch (error) {
-          res.send(error.message)
-    }
-
-})
 
 app.listen(3000,()=>{
     console.log('server running successfully')
