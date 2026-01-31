@@ -1,12 +1,7 @@
 const express = require('express')
-
 const authRouter = express.Router();
-const bcrypt = require('bcrypt')
 const User = require('../models/User')
-var jwt = require('jsonwebtoken');
 const {validateSignUpData} = require('../utils/valdation')
-const cookie = require('cookie')
-var cookieParser = require('cookie-parser')
 
 authRouter.post("/signup", validateSignUpData, async (req, res) => {
   try {

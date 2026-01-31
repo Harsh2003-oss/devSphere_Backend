@@ -1,12 +1,12 @@
 require("dotenv").config();//Load environment variables
 const connectDB = require('./config/db')
 connectDB();
-
 const express = require('express');
 const User = require("./models/User");
 const authRouter = require('./routes/auth')
+const profileRouter = require("./routes/profile")
+const requestRouter = require('./routes/requests')
 const app = express();
-const {userAuth }= require('./middlewares/auth')
 
 
 
@@ -15,6 +15,8 @@ const {userAuth }= require('./middlewares/auth')
 app.use(express.json())
 
 app.use("/api",authRouter);
+app.use('/api',profileRouter);
+app.use('/api',requestRouter);
 
 app.get('/user', async (req,res) => {
     
@@ -63,11 +65,6 @@ app.get('/feed', async (req,res) => {
     }
 })
 
-app.post("/sendConnectionRequest",userAuth,async(req,res)=>{
-    console.log("Sending a connection request");
-
-    res.send(req.user.firstName + "Sent the connect request!")
-})
 
 app.listen(3000,()=>{
     console.log('server running successfully')
