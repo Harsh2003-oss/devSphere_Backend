@@ -4,25 +4,17 @@ connectDB();
 
 const express = require('express');
 const User = require("./models/User");
-const router = require('./routes/auth')
+const authRouter = require('./routes/auth')
 const app = express();
+const {userAuth }= require('./middlewares/auth')
 
 
 
 
-
-const {validateSignUpData,validateLogin} = require('./utils/valdation')
 
 app.use(express.json())
 
-
-app.post('/login', validateLogin,async (req,res)=>{
-    try {
-        res.send("welcome to login")
-    } catch (error) {
-          res.send(error.message)
-    }
-})
+app.use("/api",authRouter);
 
 app.get('/user', async (req,res) => {
     
@@ -71,6 +63,11 @@ app.get('/feed', async (req,res) => {
     }
 })
 
+app.post("/sendConnectionRequest",userAuth,async(req,res)=>{
+    console.log("Sending a connection request");
+
+    res.send(req.user.firstName + "Sent the connect request!")
+})
 
 app.listen(3000,()=>{
     console.log('server running successfully')

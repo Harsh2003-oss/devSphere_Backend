@@ -1,54 +1,27 @@
-const validator = require('validator')
+
 const bcrypt = require('bcrypt');
 const User = require('../models/User')
 
+const validator = require('validator');
 
-const validateSignUpData =async (req,res,next) =>{
-    const {firstName,lastName,email} = req.body;
+const validateSignUpData = (req, res, next) => {
+  const { firstName, lastName, email, password } = req.body;
 
-    try {
-        
-    
-    if(!firstName || !lastName){
-        throw new Error("Name is not valid")
-    }
+  if (!firstName || !lastName) {
+    return res.status(400).send("Name is not valid");
+  }
 
-    else if(!validator.isEmail(email)){
-        throw new Error("email not valid")
-    }
+  if (!validator.isEmail(email)) {
+    return res.status(400).send("Email not valid");
+  }
+
+  if (!password || password.length < 6) {
+    return res.status(400).send("Password too short");
+  }
+
+  next();
+};
 
 
 
-
-    next();
-}
-catch (error) {
-     res.send(error.message)   
-    }
-}
-
-const validateLogin =async (req,res,next) => {
-    
-    const {email,password} = req.body;
-    
-    try {
-        const user = await User.findOne({email:email})
-
-        if(!user){
-            throw new Error("user not found")
-        }
-
-const isPasswordValid =await bcrypt.compare(password, user.password)
-console.log(password)
-if(!isPasswordValid){
-   throw new Error("Invalid Password")
-}
-
-    } catch (error) {
-          res.send(error.message)   
-    }
-
-    next();
-}
-
-module.exports = {validateSignUpData,validateLogin}
+module.exports = {validateSignUpData}

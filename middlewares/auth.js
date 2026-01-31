@@ -8,7 +8,7 @@ const userAuth = async (req,res,next) => {
             throw new Error("Token is invalid")
         }
 
-        const decodedObj = await jwt.verify(token, "SecretToken")
+        const decodedObj =  jwt.verify(token, process.env.JWT_SECRET)
 
         const {_id} = decodedObj;
 
@@ -16,6 +16,8 @@ const userAuth = async (req,res,next) => {
         if(!user){
             throw new Error("User not found");
         }
+
+        req.user = user;
         next();
 
     } catch (error) {

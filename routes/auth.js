@@ -1,58 +1,66 @@
 const express = require('express')
 
-const router = express.Router();
+const authRouter = express.Router();
 const bcrypt = require('bcrypt')
 const User = require('../models/User')
 var jwt = require('jsonwebtoken');
-const {validateLogin,validateSignUpData} = require('../utils/valdation')
+const {validateSignUpData} = require('../utils/valdation')
 const cookie = require('cookie')
 var cookieParser = require('cookie-parser')
 
-router.post("/signup",validateSignUpData, async (req,res)=>{
+authRouter.post("/signup", validateSignUpData, async (req, res) => {
+  try {
+    const { password } = req.body;
 
-    const {password}= req.body;
+    const hashedPassword = await User.hashPassword(password);
 
-    const hashedPassword = await bcrypt.hash(password,10)
+    const user = new User({
+      ...req.body,
+      password: hashedPassword
+    });
 
-
-    const user = new User({...req.body,password:hashedPassword})
-console.log(user)
-try {
     await user.save();
-    res.send("Creatd success")
-} catch (error) {
-    res.send(error.message)
-}
-})
 
-router.post("/login",validateLogin,async (req,res) =>{
-    try {
+    res.status(201).send("User created successfully");
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
+authRouter.post('/login',async(req,res,next)=>{
+   try {
         const {email,password} = req.body;
+
+        if(!email || !password){
+            return res.status(400).json({error:"Please fill all the fields"})
+        }
 
         const user = await User.findOne({email:email});
 
         if(!user){
-            throw new Error ("Invalid credentials")
+            return res.status(400).json({error:"User does not exist"})
         }
 
-        const isPasswordValid = await user.validatePassword(password);
+        const isValidPassword = await user.isValidPassword(password);
 
-        if(isPasswordValid){
-            const token = await user.getJWT();
-        
-
-res.cookie("token",token,{
-    expires:new Date(Date.now() + 8* 3600000),
-});
-res.send("Login Successfull!!")
-        }else{
-            throw new Error("Invalid Credentials")
+        if(!isValidPassword){
+            return res.status(400).json({error:"Invalid credentials"})
         }
-    }  
-     catch (error) {
-        res.status(400).send("ERROR: "+ error.message)
+
+        const token = user.generateJWT();
+        delete user._doc.password;
+
+        res.json({
+            message:"User logged in successfully",
+            user,
+            token
+        })
+
+    } catch (error) {
+        res.status(400).json({error:error.message })
     }
 })
 
 
-module.exports = router;
+   
+module.exports = authRouter;
