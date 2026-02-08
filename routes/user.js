@@ -42,7 +42,7 @@ userRouter.get('/user/connections',userAuth , async (req,res) => {
 
         const data = connectionRequests.map((row)=>{
             if(row.fromUserId._id.toString() === loggedInUser._id.toString()){
-                return row.fromUserId;
+                return row.toUserId;
             }else {
     return row.fromUserId;
   }
@@ -100,7 +100,7 @@ const users = await User.find({
 res.send(users);
 
     } catch (error) {
-        
+         res.status(400).send(error.message)
     }
 })
 

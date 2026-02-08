@@ -2,6 +2,7 @@ require("dotenv").config();//Load environment variables
 const connectDB = require('./config/db')
 connectDB();
 const express = require('express');
+const cors = require('cors'); 
 const User = require("./models/User");
 const authRouter = require('./routes/auth')
 const profileRouter = require("./routes/profile")
@@ -10,7 +11,11 @@ const userRouter = require('./routes/user')
 const app = express();
 
 
-
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  methods: ['GET', 'POST'],        
+  credentials: true                
+}));
 
 
 app.use(express.json())
