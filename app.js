@@ -8,7 +8,7 @@ const authRouter = require('./routes/auth')
 const profileRouter = require("./routes/profile")
 const requestRouter = require('./routes/requests')
 const userRouter = require('./routes/user')
-const messageRouter = require('./routes/messageRouter');
+const messageRouter = require('./routes/message');
 const app = express();
 
 

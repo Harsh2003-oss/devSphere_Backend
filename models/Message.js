@@ -31,6 +31,5 @@ const messageSchema = new mongoose.Schema(
 messageSchema.index({ senderId: 1, receiverId: 1 });
 messageSchema.index({ receiverId: 1, isRead: 1 });
 
-const Message = mongoose.model('Message', messageSchema);
+ module.exports = mongoose.model('Message', messageSchema);
 
-module.exports = Message;
