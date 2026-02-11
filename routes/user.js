@@ -102,24 +102,37 @@ const usersWithMatchScore = users.map(user => {
     const loggedInSkills = loggedInUser.skills || [];
     const userSkills = user.skills || [];
 
-    // Find common skills
     const commonSkills = loggedInSkills.filter(skill =>
         userSkills.includes(skill)
     );
 
-    // Combine both skill arrays and remove duplicates
     const allSkills = new Set([
         ...loggedInSkills,
         ...userSkills
     ]);
 
-    const similarity = allSkills.size > 0
-        ? (commonSkills.length / allSkills.size) * 100
+    let baseSimilarity = allSkills.size > 0
+        ? (commonSkills.length / allSkills.size)
         : 0;
+
+  
+    const rareSkills = ["TensorFlow", "Rust", "Kubernetes", "Docker", "AWS"];
+
+    let rareBoost = 0;
+
+    commonSkills.forEach(skill => {
+        if (rareSkills.includes(skill)) {
+            rareBoost += 0.05; // +5% per rare match
+        }
+    });
+
+    let premiumBoost = user.isPremium ? 0.05 : 0;
+
+    let finalScore = baseSimilarity + rareBoost + premiumBoost;
 
     return {
         ...user.toObject(),
-        matchScore: Math.round(similarity)
+        matchScore: Math.round(finalScore * 100)
     };
 });
 
